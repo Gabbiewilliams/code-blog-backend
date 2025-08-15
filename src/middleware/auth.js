@@ -1,25 +1,25 @@
+// backend/src/middleware/auth.js
 import jwt from 'jsonwebtoken';
 
 export function requireAuth(req, res, next) {
+  
+  console.log('[auth] raw Cookie header:', req.headers.cookie || '(none)');
+
+  
+  const token =
+    req.cookies?.token ||
+    (req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.split(' ')[1]
+      : null);
+
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+
   try {
-    //  debug logs:
-    console.log('[auth] cookies:', req.cookies);
-    console.log('[auth] auth header:', req.get('authorization'));
-
-    const auth = req.get('authorization') || '';
-    const bearer = auth.toLowerCase().startsWith('bearer ')
-      ? auth.slice(7)
-      : null;
-
-    // change token name
-    const token = req.cookies?.token || bearer;
-    if (!token) return res.status(401).json({ error: 'Not authenticated' });
-
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { _id: payload._id, name: payload.name };
-    next();
-  } catch (err) {
-    console.error('[auth] verify error:', err.message);
+    req.user = { _id: payload._id, name: payload.name, email: payload.email };
+    return next();
+  } catch (e) {
+    console.error('[auth] JWT verify failed:', e.message);
     return res.status(401).json({ error: 'Not authenticated' });
   }
 }
