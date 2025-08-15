@@ -25,22 +25,49 @@ export async function googleLogin(req, res) {
       { expiresIn: '7d' }
     );
 
+    // Cross-subdomain cookie for App Engine subdomains
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieDomain =
+      isProd
+        ? (process.env.COOKIE_DOMAIN || '.code-blog-12345.uw.r.appspot.com')
+        : undefined;
+
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: false,           // set true when on HTTPS in prod
-      maxAge: 7 * 24 * 3600 * 1000,
+      secure: isProd,                 // required on HTTPS
+      sameSite: isProd ? 'none' : 'lax',
+      domain: cookieDomain,           // leading dot enables subdomains
+      path: '/',
+      maxAge: 7 * 24 * 3600 * 1000,   // 7 days
     });
 
-    res.json({ _id: user._id, name: user.name, email: user.email, picture: user.picture, token });
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+      token,
+    });
   } catch (e) {
-    console.error(e);
+    console.error('[auth] googleLogin error:', e.message);
     res.status(401).json({ error: 'Auth failed' });
   }
 }
 
 export function logout(_req, res) {
-  res.clearCookie('shortstack_jwt');
+  const isProd = process.env.NODE_ENV === 'production';
+  const cookieDomain =
+    isProd
+      ? (process.env.COOKIE_DOMAIN || '.code-blog-12345.uw.r.appspot.com')
+      : undefined;
+
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    domain: cookieDomain,
+    path: '/',
+  });
   res.status(204).end();
 }
 
