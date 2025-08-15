@@ -1,10 +1,14 @@
-import { Router } from 'express';
+// backend/src/routes/comments.routes.js
+import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
-import { deleteComment } from '../controllers/comments.controller.js';
+import {
+  deleteComment, // if you have it
+} from '../controllers/comments.controller.js';
 
-const r = Router();
+const router = express.Router();
 
-// DELETE /api/comments/:id  (delete own comment)
-r.delete('/:id', requireAuth, deleteComment);
+// example: DELETE /api/comments/:id
+router.delete('/:id', requireAuth, deleteComment);
 
-export default r;
+export default router;
+

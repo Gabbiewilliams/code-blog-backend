@@ -25,14 +25,14 @@ export async function googleLogin(req, res) {
       { expiresIn: '7d' }
     );
 
-    res.cookie('shortstack_jwt', token, {
+    res.cookie('token', token, {
       httpOnly: true,
       sameSite: 'lax',
       secure: false,           // set true when on HTTPS in prod
       maxAge: 7 * 24 * 3600 * 1000,
     });
 
-    res.json({ _id: user._id, name: user.name, email: user.email, picture: user.picture });
+    res.json({ _id: user._id, name: user.name, email: user.email, picture: user.picture, token });
   } catch (e) {
     console.error(e);
     res.status(401).json({ error: 'Auth failed' });

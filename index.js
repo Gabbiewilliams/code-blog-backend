@@ -5,15 +5,18 @@ import dotenv from 'dotenv';
 
 import connectDB from './src/db.js';
 
+
+
 // Routers
 import authRoutes from './src/routes/auth.routes.js';
 import postsRoutes from './src/routes/posts.routes.js';
 import commentsRoutes from './src/routes/comments.routes.js';
 import favoritesRoutes from './src/routes/favorites.routes.js';
 
-// 🔧 Import the comment controllers you call below
+
 import { listComments, addComment } from './src/controllers/comments.controller.js';
 import { requireAuth } from './src/middleware/auth.js';
+
 
 dotenv.config();
 await connectDB();

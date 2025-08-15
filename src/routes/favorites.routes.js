@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import {
   getFavorites,
@@ -6,10 +6,16 @@ import {
   removeFavorite,
 } from '../controllers/favorites.controller.js';
 
-const r = Router();
+const router = express.Router();
 
-r.get('/', requireAuth, getFavorites);
-r.post('/:postId', requireAuth, addFavorite);
-r.delete('/:postId', requireAuth, removeFavorite);
+// GET /api/favorites  -> list my favorites
+router.get('/', requireAuth, getFavorites);
 
-export default r;
+// POST /api/favorites/:postId   -> add a favorite
+router.post('/:postId', requireAuth, addFavorite);
+
+// DELETE /api/favorites/:postId -> remove a favorite
+router.delete('/:postId', requireAuth, removeFavorite);
+
+export default router;
+
